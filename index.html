@@ -1,68 +1,131 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人网站 - 首页</title>
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/public.css">
-</head>
-
-<body>
-    <nav>
-        <div class="top">
-            <h1>Home</h1>
-            <ul>
-                <li><a href="index.html">个人首页</a></li>
-                <li><a href="daily.html">我的日志</a></li>
-                <li><a href="album.html">相册列表</a></li>
-                <li><a href="hobby.html">兴趣爱好</a></li>
-                <li><a href="about.html">个人介绍</a></li>
-                <li><a href="contact.html">留言板</a></li>
-            </ul>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | HerbGame</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+  </head>
+  <body>
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width=1248 height=702 tabindex="-1"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
         </div>
-    </nav>
-    <div class="welcome-section">
-        <h2>欢迎来到我的世界</h2>
+      </div>
+      <div id="unity-warning"> </div>
+      <div id="unity-footer">
+        <div id="unity-webgl-logo"></div>
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">HerbGame</div>
+      </div>
     </div>
+    <script>
 
-    <div class="content-section">
-        <div class="story-telling">
-            <div class="story">
-                <h3>我的旅程</h3>
-                <p>路漫漫其修远兮，上下求索</p>
-            </div>
-            <div class="story">
-                <h3>日常学习</h3>
-                <p>结局若非我所愿，愿于尘埃落定前再战一场</p>
-            </div>
-            <div class="story">
-                <h3>生活方式</h3>
-                <p>看山南海北，云卷云舒，品一场人间烟火</p>
-            </div>
-        </div>
+      var container = document.querySelector("#unity-container");
+      var canvas = document.querySelector("#unity-canvas");
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      var progressBarFull = document.querySelector("#unity-progress-bar-full");
+      var fullscreenButton = document.querySelector("#unity-fullscreen-button");
+      var warningBanner = document.querySelector("#unity-warning");
 
-        <div class="visionary-layout">
-            <img src="img/head.jpg" class="visionary-image">
-            <div class="visionary-text">
-                <h2>期许</h2>
-                <p>道阻且长，行则将至。海压竹枝低复举，风吹山角晦还明</p>
-            </div>
-        </div>
-    </div>
-     <div class="footer">
-     <div class="clock">
-        <p id="1">0</p>
-        <p id="2">0</p>
-        <p id="3">:</p>
-        <p id="4">0</p>
-        <p id="5">0</p>
-        <p id="6">:</p>
-        <p id="7">0</p>
-        <p id="8">0</p>
-    </div>
-</div>
-</body>
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      // If type=='warning', a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
+      function unityShowBanner(msg, type) {
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+        }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
+      }
+
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/中药篇.loader.js";
+      var config = {
+        dataUrl: buildUrl + "/中药篇.data.br",
+        frameworkUrl: buildUrl + "/中药篇.framework.js.br",
+        codeUrl: buildUrl + "/中药篇.wasm.br",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "DefaultCompany",
+        productName: "HerbGame",
+        productVersion: "1.0",
+        showBanner: unityShowBanner,
+      };
+
+      // By default, Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
+
+      // If you would like all file writes inside Unity Application.persistentDataPath
+      // directory to automatically persist so that the contents are remembered when
+      // the user revisits the site the next time, uncomment the following line:
+      // config.autoSyncPersistentDataPath = true;
+      // This autosyncing is currently not the default behavior to avoid regressing
+      // existing user projects that might rely on the earlier manual
+      // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
+      // expected to change.
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
+
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        container.className = "unity-mobile";
+        canvas.className = "unity-mobile";
+
+        // To lower canvas resolution on mobile devices to gain some
+        // performance, uncomment the following line:
+        // config.devicePixelRatio = 1;
+
+
+      } else {
+        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
+
+        canvas.style.width = "1248px";
+        canvas.style.height = "702px";
+      }
+
+      loadingBar.style.display = "block";
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          progressBarFull.style.width = 100 * progress + "%";
+              }).then((unityInstance) => {
+                loadingBar.style.display = "none";
+                fullscreenButton.onclick = () => {
+                  unityInstance.SetFullscreen(1);
+                };
+              }).catch((message) => {
+                alert(message);
+              });
+            };
+
+      document.body.appendChild(script);
+
+    </script>
+  </body>
 </html>
-<script src="java/anniu.js"></script>
-
